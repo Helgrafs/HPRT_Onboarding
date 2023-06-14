@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#include <Adafruit_BMP280.h>
 // put function declarations here:
 int myFunction(int, int);
 
