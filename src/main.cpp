@@ -31,7 +31,21 @@ void setup() {
   
   
 }
+void Barometer() {
+       Serial.print(F("Temperature = "));
+    Serial.print(bmp.readTemperature());
+    Serial.println(" *C");
 
+    Serial.print(F("Pressure = "));
+    Serial.print(bmp.readPressure());
+    Serial.println(" Pa");
+
+    Serial.print(F("Approx altitude = "));
+    Serial.print(bmp.readAltitude(1017)); // as close as i could get to actual latvia sea pressure
+    Serial.println(" m");
+
+    Serial.println();
+}
 void loop() {
   // try to parse packet
   //int packetSize = LoRa.parsePacket();
@@ -47,18 +61,6 @@ void loop() {
     // print RSSI of packet
     //Serial.print("' with RSSI ");
     //Serial.println(LoRa.packetRssi());
-     Serial.print(F("Temperature = "));
-    Serial.print(bmp.readTemperature());
-    Serial.println(" *C");
-
-    Serial.print(F("Pressure = "));
-    Serial.print(bmp.readPressure());
-    Serial.println(" Pa");
-
-    Serial.print(F("Approx altitude = "));
-    Serial.print(bmp.readAltitude(1017)); /* Adjusted to local forecast! */
-    Serial.println(" m");
-
-    Serial.println();
+    Barometer();
     delay(20000);
   }
