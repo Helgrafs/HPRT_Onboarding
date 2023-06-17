@@ -1,50 +1,64 @@
-#include <Arduino.h>
+ #include <SPI.h>
+ #include <LoRa.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_I2CDevice.h>
 #include <Adafruit_BMP280.h>
-#include <LoRa.h>
 
- Adafruit_BMP280 bmp; //links the driver for the barometer to that variable
-
-
-int message = 0; //message for the sender
-
+#define SS      19
+#define DI0     23
+Adafruit_BMP280 bmp;
 void setup() {
-  // put your setup code here, to run once:
+  
+  SPI.begin(5, 19, 27);
+  LoRa.setPins(SS, DI0);
+  
   Serial.begin(115200);
-  Serial.println("LoRa Sender");
-  if (!LoRa.begin(433E6)){      //checks if frequency works
-     Serial.println("failed");
-     while(1);
-   }
-
-   Serial.println(F("BMP280 test"));
-   unsigned status; //variable to check if it functions
-   status = bmp.begin(0x76, 0x56); //this actually initializes sensor
+  while (!Serial);
+  unsigned status;
+  status = bmp.begin();
+  if (!status) {
+    Serial.println(F("BMP Initialisation failed"));
+        while (1) delay(10);
+  } else {
+    Serial.println("BMP initialisation successful")
   }
+  Serial.println("LoRa Transmitter");
 
+ //if (!LoRa.begin(433E6)) {
+    //Serial.println("Starting LoRa failed!");
+    //while (1);
+  //}
+  
+  
+}
 
 void loop() {
-  Serial.println("Sending: ");
-  Serial.print(message);
+  // try to parse packet
+  //int packetSize = LoRa.parsePacket();
+  //if (packetSize) {
+    // received a packet
+    //Serial.print("Received packet '");
 
-  LoRa.beginPacket();
-  LoRa.print("hello ");
-  LoRa.print(message);
-  LoRa.endPacket();
+    // read packet
+   // while (LoRa.available()) {
+      //Serial.print((char)LoRa.read());
+    //}
 
-  message+3;
-  delay(5000);
+    // print RSSI of packet
+    //Serial.print("' with RSSI ");
+    //Serial.println(LoRa.packetRssi());
+     Serial.print(F("Temperature = "));
+    Serial.print(bmp.readTemperature());
+    Serial.println(" *C");
 
-  Serial.print(F("Temperature  = "));
-  Serial.print(bmp.readTemperature());
-  Serial.println(" *C");
+    Serial.print(F("Pressure = "));
+    Serial.print(bmp.readPressure());
+    Serial.println(" Pa");
 
-  Serial.print(F("Pressure = "));
-  Serial.print(bmp.readPressure()/100); 
-  Serial.println("  hPa");
+    Serial.print(F("Approx altitude = "));
+    Serial.print(bmp.readAltitude(1017)); /* Adjusted to local forecast! */
+    Serial.println(" m");
 
-  Serial.print(F("Approx altitude = "));
-  Serial.print(bmp.readAltitude(1019.66)); 
-  Serial.println("  m");                   
-
-  Serial.println();   delay(2000);
-}
+    Serial.println();
+    delay(20000);
+  }
