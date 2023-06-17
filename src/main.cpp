@@ -20,7 +20,7 @@ void setup() {
     Serial.println(F("BMP Initialisation failed"));
         while (1) delay(10);
   } else {
-    Serial.println("BMP initialisation successful")
+    Serial.println("BMP initialisation successful");
   }
   Serial.println("LoRa Transmitter");
 
