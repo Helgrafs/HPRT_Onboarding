@@ -4,30 +4,27 @@
 #include <Adafruit_I2CDevice.h>
 #include <Adafruit_BMP280.h>
 
-#define SS      19
-#define DI0     23
 Adafruit_BMP280 bmp;
 void setup() {
-  
-  SPI.begin(5, 19, 27);
-  LoRa.setPins(SS, DI0);
-  
+  // VERY IMPORTANT!!!! WHEN CONNECTING BMP280, SCL goes to pin 11 And SDA goes to pin 12!!!!!!!!!!!
   Serial.begin(115200);
   while (!Serial);
   unsigned status;
   status = bmp.begin();
-  if (!status) {
-    Serial.println(F("BMP Initialisation failed"));
-        while (1) delay(10);
-  } else {
-    Serial.println("BMP initialisation successful");
-  }
+  // if (!status) {
+  //   Serial.println(F("BMP Initialisation failed"));
+  //       while (1) delay(10);
+  // } else {
+  //   Serial.println("BMP initialisation successful");
+  // }
   Serial.println("LoRa Transmitter");
-
- //if (!LoRa.begin(433E6)) {
-    //Serial.println("Starting LoRa failed!");
-    //while (1);
-  //}
+LoRa.begin(433E6);
+//  if (!LoRa.begin(433E6)) {
+//    Serial.println("Starting LoRa failed!");
+//    while (1);
+//   }else {
+//    Serial.println("LoRa initialisation successful");
+//  }
   
   
 }
