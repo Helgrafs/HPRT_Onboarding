@@ -40,9 +40,9 @@ void setup() {
  }
   LoRa.setSyncWord(0xF7);
   LoRa.setTxPower(20);
-  LoRa.setSpreadingFactor(9);
-  LoRa.setCodingRate4(7);
-  LoRa.setSignalBandwidth(31.25E3);
+  LoRa.setSpreadingFactor(7);
+  LoRa.setCodingRate4(8);
+  LoRa.setSignalBandwidth(25E4);
 }
 void transmitter(String outgoing, int messageId) {
   LoRa.beginPacket();
@@ -61,5 +61,5 @@ void loop(){
     float altitude = bmp.readAltitude(1017);
     String Message = "Temperature: " + String(Temperature) + "*C; Pressure: " + String(pressure) + "Pa; Altitude: " + String(altitude); 
    transmitter(Message, 0);
-   delay(10000);
+   delay(3000);
 }

@@ -47,9 +47,9 @@ void setup() {
     Serial.println("LoRa initialisation successful");
  }
   LoRa.setTxPower(20);
-  LoRa.setSpreadingFactor(9);
-  LoRa.setCodingRate4(7);
-  LoRa.setSignalBandwidth(31.25E3);  
+  LoRa.setSpreadingFactor(7);
+  LoRa.setCodingRate4(8);
+  LoRa.setSignalBandwidth(25E4);  
 
 }
 
