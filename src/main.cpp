@@ -1,5 +1,5 @@
- #include <SPI.h>
- #include <LoRa.h>
+#include <SPI.h>
+#include <LoRa.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_I2CDevice.h>
 #include <Adafruit_BMP280.h>
