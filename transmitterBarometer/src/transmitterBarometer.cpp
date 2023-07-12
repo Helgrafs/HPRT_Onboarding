@@ -6,6 +6,8 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_I2CDevice.h>
 #include <Adafruit_BMP280.h>
+#include <LITTLEFS.h>
+#define FORMAT_LITTLEFS_IF_FAILED true
 // LoRa definitions, shamelessly stolen from VIP code, after cross referencing to datasheet, I get it now.
 #define SS 18
 #define RST 14
@@ -74,7 +76,7 @@ void loop()
   float pressure = bmp.readPressure();
   float altitude = bmp.readAltitude(1017);
   //create message to transmit
-  String Message = "Temperature: " + String(Temperature) + "*C; Pressure: " + String(pressure) + "Pa; Altitude: " + String(altitude);
+  String Message = String(Temperature) + ", " + String(pressure) + ", " + String(altitude);
   //transmit message
   transmitter(Message, 0);
   delay(3000);
