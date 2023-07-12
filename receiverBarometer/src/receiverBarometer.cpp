@@ -30,33 +30,33 @@ void writeFile(fs::FS &fs, const char *path, const char *message)
 {
   Serial.printf("Writing file: %s\r\n", path);
 
-  File file = fs.open(path, FILE_WRITE);
-  if (!file)
+  File file = fs.open(path, FILE_WRITE); //defines file and that it needs to be written
+  if (!file) //opens file, if it fails, says so
   {
     Serial.println("- failed to open file for writing");
     return;
   }
-  unsigned writer = file.println(message);
-  Serial.println("- file written");
-  if (!writer)
+  unsigned writer = file.println(message); //defines writing file
+  Serial.println("- file written"); 
+  if (!writer) //writes file, if it fails, says so
   {
     Serial.println("- write failed");
     return;
   }
-  file.close();
+  file.close(); //closes the file
 }
 // function to add data to a file
 void appendFile(fs::FS &fs, const char *path, const char *message)
 {
   Serial.printf("Appending to file: %s\r\n", path);
 
-  File file = fs.open(path, FILE_APPEND);
-  if (!file)
+  File file = fs.open(path, FILE_APPEND); //defines file and that it needs to be appended
+  if (!file) //opens file
   {
     Serial.println("- failed to open file for appending");
     return;
   }
-  if (file.println(message))
+  if (file.println(message)) //adds to the file
   {
     Serial.println("- message appended");
   }
@@ -110,7 +110,7 @@ void readFile(fs::FS &fs, const char *path)
   Serial.println("- read from file:");
   while (file.available())
   {
-    Serial.write(file.read());
+    Serial.write(file.read()); //reads from the file
   }
   file.close();
 }
