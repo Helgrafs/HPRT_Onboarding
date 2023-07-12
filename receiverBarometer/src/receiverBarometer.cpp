@@ -2,11 +2,11 @@
 #include <Wire.h>
 #include <Arduino.h>
 #include <SPI.h>
-//for bmp280
+// for bmp280
 #include <Adafruit_BMP280.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_I2CDevice.h>
-//for LoRa
+// for LoRa
 #include <LoRa.h>
 // LoRa pin defintions
 #define SS 18
@@ -16,47 +16,57 @@
 #define MISO 19
 #define MOSI 27
 
-//for LittleFS
+// for LittleFS
 #include <LITTLEFS.h>
 #define FORMAT_LITTLEFS_IF_FAILED true
-//function prototypes
-// variables for lora
+// function prototypes
+//  variables for lora
 int syncWord = 0xF7;
 byte _localAddress = 0xFF;
 byte _destination = 0xBB;
 boolean _canPrintHeaderMessage = false;
+// function to write a new file or overwrite existing
+void writeFile(fs::FS &fs, const char *path, const char *message)
+{
+  Serial.printf("Writing file: %s\r\n", path);
+
+  File file = fs.open(path, FILE_WRITE);
+  if (!file)
+  {
+    Serial.println("- failed to open file for writing");
+    return;
+  }
+  unsigned writer = file.println(message);
+  Serial.println("- file written");
+  if (!writer)
+  {
+    Serial.println("- write failed");
+    return;
+  }
+  file.close();
+}
+// function to add data to a file
+void appendFile(fs::FS &fs, const char *path, const char *message)
+{
+  Serial.printf("Appending to file: %s\r\n", path);
+
+  File file = fs.open(path, FILE_APPEND);
+  if (!file)
+  {
+    Serial.println("- failed to open file for appending");
+    return;
+  }
+  if (file.println(message))
+  {
+    Serial.println("- message appended");
+  }
+  else
+  {
+    Serial.println("- append failed");
+  }
+  file.close();
+}
 // function to use when receiving packet
-void writeFile(fs::FS &fs, const char * path, const char * message){
-    Serial.printf("Writing file: %s\r\n", path);
-
-    File file = fs.open(path, FILE_WRITE);
-    if(!file){
-        Serial.println("- failed to open file for writing");
-        return;
-    }
-    unsigned writer = file.println(message);
-        Serial.println("- file written");
-     if(!writer) {
-        Serial.println("- write failed");
-        return;
-    }
-    file.close();
-}
-void appendFile(fs::FS &fs, const char * path, const char * message){
-    Serial.printf("Appending to file: %s\r\n", path);
-
-    File file = fs.open(path, FILE_APPEND);
-    if(!file){
-        Serial.println("- failed to open file for appending");
-        return;
-    }
-    if(file.println(message)){
-        Serial.println("- message appended");
-    } else {
-        Serial.println("- append failed");
-    }
-    file.close();
-}
 void Receiver(int packetSize)
 {
   String Received = "";
@@ -66,7 +76,7 @@ void Receiver(int packetSize)
   byte sender = LoRa.read();
   byte MessageID = LoRa.read();
   byte receivedLength = LoRa.read();
-  
+
   while (LoRa.available())
   {
     Received += (char)LoRa.read();
@@ -81,38 +91,43 @@ void Receiver(int packetSize)
     Serial.println("wrong address");
   }
   Serial.println("Transmission: " + Received);
-  Serial.println();  
-  const char * flashReceived = Received.c_str();
-  appendFile(LITTLEFS, "/data/receivedData.txt", flashReceived);
+  Serial.println();
+  const char *flashReceived = Received.c_str();
+  appendFile(LITTLEFS, "/data/receivedData.txt", flashReceived); // adds barometer data to the file
 }
-//function for reading files
-void readFile(fs::FS &fs, const char * path){
-    Serial.printf("Reading file: %s\r\n", path); //indicates which file is being read + the path
+// function for reading files
+void readFile(fs::FS &fs, const char *path)
+{
+  Serial.printf("Reading file: %s\r\n", path); // indicates which file is being read + the path
 
-    File file = fs.open(path); //opens file
-    if(!file || file.isDirectory()){
-        Serial.println("- failed to open file for reading");
-        return;
-    }
+  File file = fs.open(path); // opens file
+  if (!file || file.isDirectory())
+  {
+    Serial.println("- failed to open file for reading");
+    return;
+  }
 
-    Serial.println("- read from file:");
-    while(file.available()){
-        Serial.write(file.read());
-    }
-    file.close();
-}
-
-
-//function to create new directories
-void createDir(fs::FS &fs, const char * path){
-    Serial.printf("Creating Dir: %s\n", path);
-    if(fs.mkdir(path)){ //this actually makes the directory
-        Serial.println("Dir created");
-    } else {
-        Serial.println("mkdir failed");
-    }
+  Serial.println("- read from file:");
+  while (file.available())
+  {
+    Serial.write(file.read());
+  }
+  file.close();
 }
 
+// function to create new directories
+void createDir(fs::FS &fs, const char *path)
+{
+  Serial.printf("Creating Dir: %s\n", path);
+  if (fs.mkdir(path))
+  { // this actually makes the directory
+    Serial.println("Dir created");
+  }
+  else
+  {
+    Serial.println("mkdir failed");
+  }
+}
 
 void setup()
 {
@@ -127,30 +142,35 @@ void setup()
   if (!LoRa.begin(433E6)) // checks if LoRa initialised
   {
     Serial.println("Starting LoRa failed!");
-    while (1);
+    while (1)
+      ;
   }
   else
   {
     Serial.println("LoRa initialisation successful");
   }
-    if(!LITTLEFS.begin(FORMAT_LITTLEFS_IF_FAILED)){
+  // initialises LITTLEFS
+  if (!LITTLEFS.begin(FORMAT_LITTLEFS_IF_FAILED))
+  {
     Serial.println("LittleFS failed to mount");
-    } else{
-      Serial.println("LittleFS mounted successfully");
-    }
+  }
+  else
+  {
+    Serial.println("LittleFS mounted successfully");
+  }
   // LoRa parameters
   LoRa.setTxPower(20);
   LoRa.setSpreadingFactor(7);
   LoRa.setCodingRate4(8);
   LoRa.setSignalBandwidth(25E4);
-  //createDir(LITTLEFS, "/data");
+  // for creating new directories
+  // createDir(LITTLEFS, "/data");
   readFile(LITTLEFS, "/data/receivedData.txt");
-  //next line is for resetting data, uncomment and run once to get a clean file to fill up with numbers
-  //writeFile(LITTLEFS, "/data/receivedData.txt", "reset");
+  // next line is for resetting data, uncomment and run once to get a clean file to fill up with numbers
+  // writeFile(LITTLEFS, "/data/receivedData.txt", "reset");
 }
 
 void loop()
 {
   Receiver(LoRa.parsePacket());
 }
-

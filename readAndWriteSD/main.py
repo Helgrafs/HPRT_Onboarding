@@ -8,11 +8,11 @@ os.mount(sd, '/sd')
 print("mounted")
 
 
-# check the content
+# checks the content of the sd card
 print("checking content")
 print(os.listdir('/sd'))
 
-# try some standard file operations
+# standard operations
 print("opening")
 f = open('/sd/test.txt', 'w')
 f.write("teksts")
